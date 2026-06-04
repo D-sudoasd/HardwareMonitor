@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="320" viewBox="0 0 1120 320" role="img" aria-label="HardwareMonitor micro-bar preview">
+  <defs>
+    <filter id="shadow" x="-10%" y="-30%" width="120%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000" flood-opacity="0.36"/>
+    </filter>
+  </defs>
+  <rect width="1120" height="320" fill="#0f1720"/>
+  <g opacity="0.22" fill="#607083" font-family="Segoe UI, Arial" font-size="18">
+    <text x="92" y="78">analysis.csv</text>
+    <text x="92" y="126">beamtime_notes.md</text>
+    <text x="92" y="174">processing_report.xlsx</text>
+    <text x="92" y="222">diffraction_scan_042.tif</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="270" y="58" width="580" height="44" rx="10" fill="#11161d" stroke="#364150" stroke-width="2"/>
+    <rect x="288" y="70" width="5" height="22" rx="2.5" fill="#7dd3fc"/>
+    <text x="302" y="87" fill="#aab2bf" font-family="Segoe UI, Arial" font-size="16" font-weight="700">CPU</text>
+    <text x="344" y="88" fill="#f8fafc" font-family="Segoe UI, Arial" font-size="19" font-weight="800">56%</text>
+    <rect x="420" y="70" width="5" height="22" rx="2.5" fill="#a7f3d0"/>
+    <text x="434" y="87" fill="#aab2bf" font-family="Segoe UI, Arial" font-size="16" font-weight="700">MEM</text>
+    <text x="480" y="88" fill="#f8fafc" font-family="Segoe UI, Arial" font-size="19" font-weight="800">40%</text>
+    <rect x="558" y="70" width="5" height="22" rx="2.5" fill="#fbbf24"/>
+    <text x="572" y="87" fill="#aab2bf" font-family="Segoe UI, Arial" font-size="16" font-weight="700">DSK</text>
+    <text x="616" y="88" fill="#f8fafc" font-family="Segoe UI, Arial" font-size="19" font-weight="800">69%</text>
+    <rect x="692" y="70" width="5" height="22" rx="2.5" fill="#f472b6"/>
+    <text x="706" y="87" fill="#aab2bf" font-family="Segoe UI, Arial" font-size="16" font-weight="700">IO</text>
+    <text x="736" y="88" fill="#f8fafc" font-family="Segoe UI, Arial" font-size="19" font-weight="800">R65/W73</text>
+    <rect x="270" y="124" width="580" height="132" rx="10" fill="#11161d" stroke="#364150" stroke-width="2"/>
+    <text x="292" y="154" fill="#cbd5e1" font-family="Segoe UI, Arial" font-size="15">Click the micro-bar for trends and sensor details.</text>
+    <rect x="292" y="176" width="536" height="58" rx="7" fill="#151b23" stroke="#364150"/>
+    <polyline points="306,211 366,205 426,208 486,198 546,201 606,190 666,207 726,196 786,191 814,198" fill="none" stroke="#7dd3fc" stroke-width="4"/>
+    <polyline points="306,217 814,217" fill="none" stroke="#a7f3d0" stroke-width="3"/>
+    <polyline points="306,228 814,228" fill="none" stroke="#fbbf24" stroke-width="3"/>
+  </g>
+</svg>
