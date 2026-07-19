@@ -1,70 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
   <title id="title">HardwareMonitor</title>
-  <desc id="desc">Windows desktop micro-bar for CPU, memory, disk, I/O, and temperature status without covering your work.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0b1016"/>
-      <stop offset="100%" stop-color="#121a24"/>
-    </linearGradient>
-    <linearGradient id="barGlow" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#7dd3fc" stop-opacity="0.15"/>
-      <stop offset="50%" stop-color="#a7f3d0" stop-opacity="0.08"/>
-      <stop offset="100%" stop-color="#f472b6" stop-opacity="0.12"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="1200" height="360" rx="28" fill="url(#bg)"/>
-
-  <!-- faint desktop document silhouettes -->
-  <g opacity="0.18" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="18">
-    <text x="64" y="86">analysis.csv</text>
-    <text x="64" y="128">beamtime_notes.md</text>
-    <text x="64" y="170">processing_report.xlsx</text>
-    <text x="64" y="212">diffraction_scan_042.tif</text>
+  <desc id="desc">Always-on-top Windows micro-bar for CPU, memory, disk, I/O, and temperature without covering your work.</desc>
+  <rect width="1200" height="360" rx="26" fill="#050607"/>
+  <path d="M0 52H1200M718 0V360" stroke="#1C1F24"/>
+  <g transform="translate(56 40)" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
+    <text fill="#7A8088" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13" letter-spacing="2.4">WINDOWS DESKTOP · LOW-OBSTRUCTION TELEMETRY</text>
+    <text y="96" fill="#F4F5F6" font-size="58" font-weight="750" letter-spacing="-2.2">HardwareMonitor</text>
+    <text y="144" fill="#A8ADB4" font-size="23" font-weight="450">Live system metrics in a 38 px bar — not a dashboard.</text>
+    <path d="M0 172H520" stroke="#2A2E34"/>
+    <g transform="translate(0 206)" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12">
+      <text fill="#F4F5F6">CPU</text>
+      <text x="72" fill="#6E747C">MEM</text>
+      <text x="148" fill="#6E747C">DISK</text>
+      <text x="228" fill="#6E747C">I/O</text>
+      <text x="292" fill="#6E747C">TEMP</text>
+      <text x="376" fill="#6E747C">NO FAKE °C</text>
+    </g>
+    <text y="268" fill="#5A6068" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12">portable ZIP · MIT · LibreHardwareMonitor sensors</text>
   </g>
-
-  <!-- left title block -->
-  <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
-    <text x="64" y="250" fill="#7dd3fc" font-size="18" font-weight="700" letter-spacing="2">WINDOWS · ALWAYS ON TOP</text>
-    <text x="64" y="300" fill="#f8fafc" font-size="48" font-weight="800">HardwareMonitor</text>
-    <text x="64" y="336" fill="#94a3b8" font-size="20">Live system telemetry in a 38 px micro-bar</text>
+  <!-- precise micro-bar specimen -->
+  <g transform="translate(760 78)">
+    <rect x="-18" y="-24" width="404" height="228" fill="#0B0D10" stroke="#262A30"/>
+    <text x="12" y="8" fill="#4A5058" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">DESKTOP / ALWAYS-ON-TOP</text>
+    <!-- bar -->
+    <rect y="28" width="368" height="42" rx="8" fill="#12151A" stroke="#343A42"/>
+    <rect x="12" y="40" width="3" height="18" rx="1.5" fill="#8FD3FF"/>
+    <text x="22" y="54" fill="#8A9098" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">CPU</text>
+    <text x="56" y="54" fill="#F4F5F6" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="750">56%</text>
+    <rect x="108" y="40" width="3" height="18" rx="1.5" fill="#8FE3B8"/>
+    <text x="118" y="54" fill="#8A9098" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">MEM</text>
+    <text x="156" y="54" fill="#F4F5F6" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="750">40%</text>
+    <rect x="210" y="40" width="3" height="18" rx="1.5" fill="#E8C36A"/>
+    <text x="220" y="54" fill="#8A9098" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">DSK</text>
+    <text x="254" y="54" fill="#F4F5F6" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="750">69%</text>
+    <rect x="300" y="40" width="3" height="18" rx="1.5" fill="#E8A0C0"/>
+    <text x="310" y="54" fill="#F4F5F6" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">IO</text>
+    <!-- trend -->
+    <rect y="88" width="368" height="100" rx="8" fill="#12151A" stroke="#343A42"/>
+    <text x="14" y="112" fill="#6E747C" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12">10-minute in-memory history</text>
+    <polyline points="20,160 70,152 120,156 170,140 220,146 270,132 320,148 348,138" fill="none" stroke="#8FD3FF" stroke-width="2.2"/>
+    <polyline points="20,168 348,168" fill="none" stroke="#343A42" stroke-width="1"/>
   </g>
-
-  <!-- floating micro-bar proof -->
-  <g transform="translate(560 72)">
-    <rect x="-12" y="-12" width="600" height="220" rx="20" fill="url(#barGlow)"/>
-    <rect x="0" y="0" width="576" height="48" rx="12" fill="#11161d" stroke="#364150" stroke-width="2"/>
-    <rect x="16" y="13" width="5" height="22" rx="2.5" fill="#7dd3fc"/>
-    <text x="30" y="31" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">CPU</text>
-    <text x="72" y="31" fill="#f8fafc" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="800">56%</text>
-    <rect x="140" y="13" width="5" height="22" rx="2.5" fill="#a7f3d0"/>
-    <text x="154" y="31" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">MEM</text>
-    <text x="200" y="31" fill="#f8fafc" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="800">40%</text>
-    <rect x="272" y="13" width="5" height="22" rx="2.5" fill="#fbbf24"/>
-    <text x="286" y="31" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">DSK</text>
-    <text x="328" y="31" fill="#f8fafc" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="800">69%</text>
-    <rect x="392" y="13" width="5" height="22" rx="2.5" fill="#f472b6"/>
-    <text x="406" y="31" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">IO</text>
-    <text x="434" y="31" fill="#f8fafc" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="800">R65/W73</text>
-    <rect x="528" y="13" width="5" height="22" rx="2.5" fill="#c4b5fd"/>
-    <text x="542" y="31" fill="#f8fafc" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700">TEMP</text>
-
-    <!-- expanded trend panel -->
-    <rect x="0" y="64" width="576" height="132" rx="12" fill="#11161d" stroke="#364150" stroke-width="2"/>
-    <text x="20" y="92" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16">Click to expand · 10-minute in-memory history</text>
-    <rect x="20" y="110" width="536" height="66" rx="8" fill="#151b23" stroke="#2a3441"/>
-    <polyline points="36,155 96,148 156,152 216,138 276,142 336,128 396,150 456,136 516,130 540,138" fill="none" stroke="#7dd3fc" stroke-width="3.5"/>
-    <polyline points="36,160 540,160" fill="none" stroke="#a7f3d0" stroke-width="2.5"/>
-    <polyline points="36,168 540,168" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
-  </g>
-
-  <!-- bottom metadata chips -->
-  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15">
-    <rect x="560" y="308" width="92" height="28" rx="8" fill="#1e293b"/>
-    <text x="576" y="327" fill="#94a3b8">portable</text>
-    <rect x="664" y="308" width="72" height="28" rx="8" fill="#1e293b"/>
-    <text x="680" y="327" fill="#94a3b8">MIT</text>
-    <rect x="748" y="308" width="140" height="28" rx="8" fill="#1e293b"/>
-    <text x="764" y="327" fill="#94a3b8">no fabricated °C</text>
-  </g>
+  <text x="1144" y="336" text-anchor="end" fill="#4A5058" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12">D-sudoasd / HardwareMonitor</text>
 </svg>
