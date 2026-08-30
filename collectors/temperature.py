@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import os
 import sys
 from dataclasses import dataclass
@@ -37,6 +38,8 @@ class TemperatureCollector:
         self._dll_path = Path(dll_path) if dll_path else default_dll_path()
         self._computer: Any | None = None
         self._sensor_type: Any | None = None
+        self._dll_directory_handle: Any | None = None
+        self._closed = False
         self._status = SensorStatus(
             provider="LibreHardwareMonitor",
             available=False,
@@ -45,6 +48,16 @@ class TemperatureCollector:
         self._initialize()
 
     def collect(self) -> TemperatureSnapshot:
+        if self._closed:
+            return TemperatureSnapshot(
+                None,
+                None,
+                SensorStatus(
+                    provider="LibreHardwareMonitor",
+                    available=False,
+                    message="Temperature collector is closed",
+                ),
+            )
         if self._computer is None:
             return TemperatureSnapshot(None, None, self._status)
 
@@ -52,17 +65,28 @@ class TemperatureCollector:
         storage_values: list[tuple[str, float]] = []
         invalid_cpu_values = 0
         invalid_storage_values = 0
+        hardware_errors = 0
+        self._hardware_errors = 0
 
         try:
             for hardware in self._iter_hardware(self._computer.Hardware):
-                hardware_type = str(hardware.HardwareType).lower()
-                for sensor in hardware.Sensors:
-                    raw_value = self._raw_temperature_value(sensor)
-                    if raw_value is None:
+                try:
+                    hardware_type = str(hardware.HardwareType).lower()
+                    sensors = hardware.Sensors
+                except Exception:
+                    hardware_errors += 1
+                    continue
+                for sensor in sensors:
+                    try:
+                        raw_value = self._raw_temperature_value(sensor)
+                        if raw_value is None:
+                            continue
+                        name = str(sensor.Name)
+                        value = self._valid_temperature_value(raw_value)
+                        sensor_target = self._classify_temperature_sensor(hardware_type, name)
+                    except Exception:
+                        hardware_errors += 1
                         continue
-                    name = str(sensor.Name)
-                    value = self._valid_temperature_value(raw_value)
-                    sensor_target = self._classify_temperature_sensor(hardware_type, name)
                     if sensor_target == "cpu":
                         if value is None:
                             invalid_cpu_values += 1
@@ -76,7 +100,14 @@ class TemperatureCollector:
 
             cpu_temp = self._choose_cpu_temperature(cpu_values)
             disk_temp = self._choose_max_temperature(storage_values)
-            status = self._build_status(cpu_temp, disk_temp, invalid_cpu_values, invalid_storage_values)
+            hardware_errors += self._hardware_errors
+            status = self._build_status(
+                cpu_temp,
+                disk_temp,
+                invalid_cpu_values,
+                invalid_storage_values,
+                hardware_errors,
+            )
             return TemperatureSnapshot(cpu_temp, disk_temp, status)
         except Exception as exc:  # Hardware sensor APIs can fail per machine/driver.
             return TemperatureSnapshot(
@@ -101,12 +132,14 @@ class TemperatureCollector:
             from LibreHardwareMonitor.Hardware import Computer, SensorType  # type: ignore[import-not-found]
 
             computer = Computer()
+            # Retain the object before Open() so a partial initialization can
+            # still be closed if the native provider raises.
+            self._computer = computer
             computer.IsCpuEnabled = True
             computer.IsMotherboardEnabled = True
             computer.IsStorageEnabled = True
             computer.Open()
 
-            self._computer = computer
             self._sensor_type = SensorType
             self._status = SensorStatus(
                 provider="LibreHardwareMonitor",
@@ -114,6 +147,7 @@ class TemperatureCollector:
                 message="LibreHardwareMonitor loaded; waiting for temperature sensors",
             )
         except Exception as exc:
+            self._close_computer()
             self._computer = None
             self._sensor_type = None
             self._status = SensorStatus(
@@ -125,15 +159,26 @@ class TemperatureCollector:
     def _prepare_assembly_path(self) -> None:
         vendor_dir = str(self._dll_path.parent)
         if hasattr(os, "add_dll_directory"):
-            os.add_dll_directory(vendor_dir)
+            self._dll_directory_handle = os.add_dll_directory(vendor_dir)
         if vendor_dir not in sys.path:
             sys.path.insert(0, vendor_dir)
 
     def _iter_hardware(self, hardware_items: Any) -> Any:
         for hardware in hardware_items:
-            self._update_hardware(hardware)
-            yield hardware
-            yield from self._iter_hardware(hardware.SubHardware)
+            update_failed = False
+            try:
+                self._update_hardware(hardware)
+            except Exception:
+                self._hardware_errors = getattr(self, "_hardware_errors", 0) + 1
+                update_failed = True
+            if not update_failed:
+                yield hardware
+            try:
+                sub_hardware = hardware.SubHardware
+            except Exception:
+                self._hardware_errors = getattr(self, "_hardware_errors", 0) + 1
+                continue
+            yield from self._iter_hardware(sub_hardware)
 
     def _update_hardware(self, hardware: Any) -> None:
         hardware.Update()
@@ -155,9 +200,43 @@ class TemperatureCollector:
 
     @staticmethod
     def _valid_temperature_value(value: float) -> float | None:
-        if value <= 0.0 or value > 125.0:
+        numeric_value = float(value)
+        if not math.isfinite(numeric_value) or numeric_value <= 0.0 or numeric_value > 125.0:
             return None
-        return value
+        return numeric_value
+
+    def _close_computer(self) -> None:
+        computer = self._computer
+        self._computer = None
+        if computer is None:
+            return
+        close_method = getattr(computer, "Close", None)
+        if callable(close_method):
+            try:
+                close_method()
+            except Exception:
+                # Close is best effort during exception unwinding.  The
+                # lifecycle is still marked closed so a later shutdown cannot
+                # invoke a potentially unsafe native object twice.
+                pass
+
+    def close(self) -> None:
+        """Release LibreHardwareMonitor and its DLL search-path handle once."""
+
+        if self._closed:
+            return
+        self._closed = True
+        self._close_computer()
+
+        handle = self._dll_directory_handle
+        self._dll_directory_handle = None
+        if handle is not None:
+            close_method = getattr(handle, "close", None)
+            if callable(close_method):
+                try:
+                    close_method()
+                except Exception:
+                    pass
 
     @staticmethod
     def _classify_temperature_sensor(hardware_type: str, sensor_name: str) -> str | None:
@@ -181,6 +260,7 @@ class TemperatureCollector:
         disk_temp: float | None,
         invalid_cpu_values: int = 0,
         invalid_storage_values: int = 0,
+        hardware_errors: int = 0,
     ) -> SensorStatus:
         missing: list[str] = []
         if cpu_temp is None:
@@ -188,7 +268,10 @@ class TemperatureCollector:
         if disk_temp is None:
             missing.append("disk")
         if not missing:
-            return SensorStatus("LibreHardwareMonitor", True, "OK")
+            detail = "OK"
+            if hardware_errors:
+                detail += f"; {hardware_errors} hardware node update failed"
+            return SensorStatus("LibreHardwareMonitor", True, detail)
 
         invalid: list[str] = []
         if cpu_temp is None and invalid_cpu_values:
@@ -197,34 +280,49 @@ class TemperatureCollector:
             invalid.append("disk returned invalid values")
         if invalid:
             detail = "; ".join(invalid)
+            if hardware_errors:
+                detail += f"; {hardware_errors} hardware node update failed"
             return SensorStatus(
                 "LibreHardwareMonitor",
                 False,
                 f"{detail}. Run as Administrator and compare with LibreHardwareMonitor GUI.",
             )
 
+        detail = f"Sensor unavailable: {', '.join(missing)} temperature"
+        if hardware_errors:
+            detail += f"; {hardware_errors} hardware node update failed"
         return SensorStatus(
             "LibreHardwareMonitor",
             False,
-            f"Sensor unavailable: {', '.join(missing)} temperature",
+            detail,
         )
 
     @staticmethod
     def _choose_cpu_temperature(values: list[tuple[str, float]]) -> float | None:
-        if not values:
+        valid_values = [
+            (name, validated)
+            for name, value in values
+            if (validated := TemperatureCollector._valid_temperature_value(value)) is not None
+        ]
+        if not valid_values:
             return None
 
         package_values = [
             value
-            for name, value in values
+            for name, value in valid_values
             if "package" in name.lower() or "tdie" in name.lower() or "tctl" in name.lower()
         ]
         if package_values:
             return max(package_values)
-        return max(value for _, value in values)
+        return max(value for _, value in valid_values)
 
     @staticmethod
     def _choose_max_temperature(values: list[tuple[str, float]]) -> float | None:
-        if not values:
+        valid_values = [
+            validated
+            for _, value in values
+            if (validated := TemperatureCollector._valid_temperature_value(value)) is not None
+        ]
+        if not valid_values:
             return None
-        return max(value for _, value in values)
+        return max(valid_values)

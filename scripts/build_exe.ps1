@@ -1,5 +1,6 @@
 param(
-    [switch]$SkipTests
+    [switch]$SkipTests,
+    [switch]$ProbeOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -31,42 +32,142 @@ function Assert-InProject {
 
 function Get-PythonCommand {
     if (Test-Path $VenvPython) {
-        return $VenvPython
+        if (Test-PythonExecutable -Executable $VenvPython) {
+            return $VenvPython
+        }
+        Write-Warning "Configured .venv interpreter is not executable: $VenvPython"
     }
 
     $python = Get-Command python -ErrorAction SilentlyContinue
-    if ($python) {
+    if ($python -and (Test-PythonExecutable -Executable $python.Source)) {
         return $python.Source
+    }
+    if ($python) {
+        Write-Warning "Skipping non-working python candidate: $($python.Source)"
     }
 
     $py = Get-Command py -ErrorAction SilentlyContinue
-    if ($py) {
+    if ($py -and (Test-PythonExecutable -Executable $py.Source -PrefixArguments @('-3'))) {
         return $py.Source
     }
 
-    throw "Python was not found. Install Python 3.11+ or create .venv first."
+    throw "No executable Python 3.11+ interpreter was found. Install Python 3.11+ or create .venv first."
+}
+
+function Test-PythonExecutable {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Executable,
+        [string[]]$PrefixArguments = @()
+    )
+
+    $version = Get-PythonVersion -Executable $Executable -PrefixArguments $PrefixArguments
+    if (-not $version) {
+        return $false
+    }
+    try {
+        return [version]$version -ge [version]'3.11'
+    }
+    catch {
+        return $false
+    }
+}
+
+function Get-PythonVersion {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Executable,
+        [string[]]$PrefixArguments = @()
+    )
+
+    try {
+        $output = @(& $Executable @PrefixArguments -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')" 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $output.Count -eq 0) {
+            return $null
+        }
+        $version = ([string]$output[0]).Trim()
+        if ($version -notmatch '^\d+\.\d+(\.\d+)?$') {
+            return $null
+        }
+        return $version
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-PythonPrefixArguments {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Executable
+    )
+
+    if ((Split-Path -Leaf $Executable) -ieq "py.exe") {
+        return @("-3")
+    }
+    return @()
 }
 
 function Ensure-Venv {
-    if (Test-Path $VenvPython) {
+    if ((Test-Path $VenvPython) -and (Test-PythonExecutable -Executable $VenvPython)) {
         return
     }
 
     $python = Get-PythonCommand
+    $pythonArguments = Get-PythonPrefixArguments -Executable $python
     Write-Host "Creating .venv..."
-    if ((Split-Path -Leaf $python) -ieq "py.exe") {
-        & $python -3 -m venv (Join-Path $ProjectRoot ".venv")
+    & $python @pythonArguments -m venv (Join-Path $ProjectRoot ".venv")
+    if (-not (Test-PythonExecutable -Executable $VenvPython)) {
+        throw "The newly created .venv interpreter is not executable: $VenvPython"
     }
-    else {
-        & $python -m venv (Join-Path $ProjectRoot ".venv")
+}
+
+function Get-OptionalPropertyValue {
+    param(
+        [AllowNull()]
+        [object]$InputObject,
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if ($null -eq $InputObject) {
+        return $null
     }
+    $property = $InputObject.PSObject.Properties[$Name]
+    if ($null -eq $property) {
+        return $null
+    }
+    return $property.Value
 }
 
 function Get-LibreHardwareMonitorTag {
     $latestUrl = "$RepoUrl/releases/latest"
     $response = Invoke-WebRequest -Uri $latestUrl -UseBasicParsing
-    $uri = $response.BaseResponse.ResponseUri.AbsoluteUri
-    $tag = Split-Path ([System.Uri]$uri).AbsolutePath -Leaf
+    # Windows PowerShell exposes BaseResponse.ResponseUri, while recent
+    # PowerShell 7 builds can expose only the final request URI or a Location
+    # header.  Resolve all supported shapes before parsing the tag.
+    $uri = $null
+    $baseResponse = Get-OptionalPropertyValue -InputObject $response -Name "BaseResponse"
+    $responseUri = Get-OptionalPropertyValue -InputObject $baseResponse -Name "ResponseUri"
+    if ($responseUri) {
+        $uri = [System.Uri]$responseUri
+    }
+    if (-not $uri) {
+        $requestMessage = Get-OptionalPropertyValue -InputObject $baseResponse -Name "RequestMessage"
+        $requestUri = Get-OptionalPropertyValue -InputObject $requestMessage -Name "RequestUri"
+        if ($requestUri) {
+            $uri = [System.Uri]$requestUri
+        }
+    }
+    $headers = Get-OptionalPropertyValue -InputObject $response -Name "Headers"
+    $location = Get-OptionalPropertyValue -InputObject $headers -Name "Location"
+    if (-not $uri -and $location) {
+        $uri = [System.Uri]::new([System.Uri]$latestUrl, [string]$location)
+    }
+    if (-not $uri) {
+        throw "Could not determine LibreHardwareMonitor release URL from $latestUrl"
+    }
+    $tag = Split-Path $uri.AbsolutePath -Leaf
     if (-not $tag -or $tag -notmatch "^v\d+\.\d+\.\d+$") {
         throw "Could not determine LibreHardwareMonitor latest release tag from $uri"
     }
@@ -122,6 +223,15 @@ try {
     Assert-InProject $DistDir
     Assert-InProject $BuildDir
 
+    if ($ProbeOnly) {
+        $selectedPython = Get-PythonCommand
+        $selectedPrefix = Get-PythonPrefixArguments -Executable $selectedPython
+        $selectedVersion = Get-PythonVersion -Executable $selectedPython -PrefixArguments $selectedPrefix
+        Write-Output "selected_python=$selectedPython"
+        Write-Output "selected_python_version=$selectedVersion"
+        return
+    }
+
     Ensure-Venv
     & $VenvPython -m pip install -r requirements-dev.txt
 
@@ -129,7 +239,7 @@ try {
 
     if (-not $SkipTests) {
         & $VenvPython -m pytest
-        & $VenvPython -m py_compile main.py app.py collectors\system_metrics.py collectors\temperature.py models\sample.py ui\floating_monitor.py
+        & $VenvPython -m py_compile main.py app.py settings.py windows_integration.py collectors\system_metrics.py collectors\temperature.py models\sample.py ui\floating_monitor.py
     }
 
     if (Test-Path $BuildDir) {

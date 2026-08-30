@@ -26,7 +26,9 @@ jobs:
           python -m pip install -r requirements-dev.txt
 
       - name: Run tests
-        run: python -m pytest
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest -q
 
       - name: Compile sources
-        run: python -m py_compile main.py app.py collectors\system_metrics.py collectors\temperature.py models\sample.py ui\floating_monitor.py
+        run: python -m py_compile main.py app.py settings.py windows_integration.py collectors\system_metrics.py collectors\temperature.py models\sample.py ui\floating_monitor.py
