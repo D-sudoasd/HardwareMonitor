@@ -1,6 +1,43 @@
 <p align="center">
-  <img src="assets/readme/hero.svg" width="100%" alt="HardwareMonitor: always-on-top Windows micro-bar for live system telemetry.">
+  <img src="assets/readme/hero.png" width="100%" alt="HardwareMonitor — Keep desktop hardware activity visible without a large dashboard / 以紧凑桌面状态栏查看硬件活动. Conceptual illustration / 概念插图。">
 </p>
+
+# HardwareMonitor
+
+**Keep desktop hardware activity visible without a large dashboard**
+
+**以紧凑桌面状态栏查看硬件活动**
+
+[Overview / 项目概览](#overview--项目概览) · [Start / 开始使用](#start--开始使用) · [Reference / 详细说明](#reference--详细说明)
+
+## Overview / 项目概览
+
+Monitor CPU, memory, disk activity and available temperature sensors in a compact Windows bar. Open recent history when a changing value needs closer inspection.
+
+在紧凑 Windows 状态栏中查看 CPU、内存、磁盘活动及可用温度传感器，并按需展开近期历史。
+
+- **Compact monitoring** — 常驻显示常用系统指标。
+- **Recent history** — 查看所选指标的近期变化。
+- **Sensor status** — 明确显示缺失或无效传感器读数。
+
+## Start / 开始使用
+
+Source setup / 源码启动：
+
+```powershell
+py -m pip install -r requirements-dev.txt
+py main.py
+```
+
+Packaged downloads / 打包下载：[Releases](https://github.com/D-sudoasd/HardwareMonitor/releases).
+
+Temperature availability depends on firmware, controller support and sensor permissions. Missing readings are displayed as unavailable.
+
+温度可用性取决于固件、控制器支持和传感器权限；缺失读数显示为不可用。
+
+*Cover: AI-generated conceptual illustration. 封面为 AI 生成的概念插图。*
+
+## Reference / 详细说明
 
 # HardwareMonitor
 
