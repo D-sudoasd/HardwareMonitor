@@ -79,11 +79,14 @@ Always-on-top micro-bar for CPU, memory, disk usage, disk I/O, and hardware temp
 1. Download `HardwareMonitor.zip`.
 2. Extract it anywhere.
 3. Run `HardwareMonitor.exe`.
-4. The normal launch does **not** require UAC. If temperature access is unavailable, use **Restart as administrator** from the bar's Menu or tray menu; cancelling UAC leaves the current app running.
+
+The published **v1.0.0** executable requests administrator privileges at startup. The current source includes unreleased improvements: normal launch without UAC, explicit **Restart as administrator**, a tray menu, persisted settings, and background sensor collection. Build or run the current source to use these improvements; see [CHANGELOG.md](CHANGELOG.md).
+
+已发布的 **v1.0.0** 启动时会请求管理员权限。普通启动无需 UAC、手动管理员重启、托盘菜单、设置保存和后台采集属于当前源码中的未发布更新；使用这些功能请从源码运行或构建。
 
 CPU, memory, disk, and I/O still work when temperature is unavailable.
 
-## Usage
+## Usage (current source)
 
 - **Drag** to reposition · **Left-click** expand/collapse · **Enter/Space** expand/collapse · **Escape** collapse · **Move away** to fold · **Right-click/Menu** for actions
 - The tray menu provides **Show**, **Hide**, and **Quit**. If Windows reports no tray, closing the bar exits normally instead of leaving a headless process.
