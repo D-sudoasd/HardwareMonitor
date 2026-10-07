@@ -24,6 +24,18 @@ A compact Windows telemetry bar for keeping live system activity beside your doc
 
 **选择下载版还是源码版。** 已发布的 `v1.0.0` 会在启动时请求管理员权限；当前源码另有普通启动、手动管理员重启、托盘和设置保存等更新。下方分别说明下载和源码使用方法。
 
+## 原理示意 / Principle schematic
+
+<p align="center">
+  <img src="assets/readme/principle.png" width="100%" alt="Hardware sources, compact telemetry and optional temperature availability — conceptual schematic / 概念示意图">
+</p>
+
+*CPU、内存与磁盘分别对应系统活动指标，近期历史用于查看变化；温度依赖可用传感器，缺失读数显示 N/A。硬件与趋势曲线为概念示意，不是当前机器测量。*
+
+*CPU, memory and disks supply system activity metrics with recent-history views; temperature depends on available sensors and missing readings show N/A. Hardware and trends are conceptual, not current-machine measurements.*
+
+[查看完整示意图 / View full-size schematic](assets/readme/principle.png)
+
 ## How it works
 
 1. Collects CPU, memory, and disk metrics with **psutil**.
