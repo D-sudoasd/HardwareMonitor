@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/readme/hero.png" width="100%" alt="HardwareMonitor — Keep desktop hardware activity visible without a large dashboard / 以紧凑桌面状态栏查看硬件活动. Conceptual illustration / 概念插图。">
+</p>
+
 # HardwareMonitor
 
 **CPU、内存、磁盘与温度状态，放在一个可拖动的 Windows 桌面状态栏中。**
