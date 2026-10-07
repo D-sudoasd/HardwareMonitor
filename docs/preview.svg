@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1120" height="320" viewBox="0 0 1120 320" role="img" aria-label="HardwareMonitor micro-bar preview">
+  <title>HardwareMonitor interface layout preview</title>
+  <desc>Illustrative Windows telemetry bar and expanded history panel. Displayed numbers are demonstration values.</desc>
   <defs>
     <filter id="shadow" x="-10%" y="-30%" width="120%" height="180%">
       <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#000" flood-opacity="0.36"/>

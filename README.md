@@ -1,64 +1,24 @@
-<p align="center">
-  <img src="assets/readme/hero.png" width="100%" alt="HardwareMonitor — Keep desktop hardware activity visible without a large dashboard / 以紧凑桌面状态栏查看硬件活动. Conceptual illustration / 概念插图。">
-</p>
-
 # HardwareMonitor
 
-**Keep desktop hardware activity visible without a large dashboard**
+**CPU、内存、磁盘与温度状态，放在一个可拖动的 Windows 桌面状态栏中。**
 
-**以紧凑桌面状态栏查看硬件活动**
+A compact Windows telemetry bar for keeping live system activity beside your documents, terminals, and analysis software. Expand the recent history only when you need to inspect a trend.
 
-[Overview / 项目概览](#overview--项目概览) · [Start / 开始使用](#start--开始使用) · [Reference / 详细说明](#reference--详细说明)
+[Windows 下载](https://github.com/D-sudoasd/HardwareMonitor/releases/latest) · [当前源码用法](#usage-current-source) · [温度读数说明](#temperature-notes) · [更新记录](CHANGELOG.md)
 
-## Overview / 项目概览
+[![MIT](https://img.shields.io/badge/License-MIT-455A64)](LICENSE)
 
-Monitor CPU, memory, disk activity and available temperature sensors in a compact Windows bar. Open recent history when a changing value needs closer inspection.
+![界面布局示意：紧凑状态栏及展开的历史面板，图中数值为演示值](docs/preview.svg)
 
-在紧凑 Windows 状态栏中查看 CPU、内存、磁盘活动及可用温度传感器，并按需展开近期历史。
+*上图是仓库已有的界面布局示意，不是当前机器的测量截图。*
 
-- **Compact monitoring** — 常驻显示常用系统指标。
-- **Recent history** — 查看所选指标的近期变化。
-- **Sensor status** — 明确显示缺失或无效传感器读数。
-
-## Start / 开始使用
-
-Source setup / 源码启动：
-
-```powershell
-py -m pip install -r requirements-dev.txt
-py main.py
-```
-
-Packaged downloads / 打包下载：[Releases](https://github.com/D-sudoasd/HardwareMonitor/releases).
-
-Temperature availability depends on firmware, controller support and sensor permissions. Missing readings are displayed as unavailable.
-
-温度可用性取决于固件、控制器支持和传感器权限；缺失读数显示为不可用。
-
-*Cover: AI-generated conceptual illustration. 封面为 AI 生成的概念插图。*
-
-## Reference / 详细说明
-
-# HardwareMonitor
-
-**Live system telemetry in a thin Windows bar — not a dashboard that eats your screen.**
-
-Always-on-top micro-bar for CPU, memory, disk usage, disk I/O, and hardware temperature status. Built for people who need live numbers next to documents, terminals, plots, or lab software.
-
-<p align="center">
-  <img src="assets/readme/section-01-why.svg" width="100%" alt="01 Why: telemetry without covering your work.">
-</p>
-
-| Problem | What HardwareMonitor does |
+| 日常查看 | 需要进一步检查时 |
 | --- | --- |
-| Full dashboards cover the work | Default bar height about **38 px**, always on top |
-| One-line glance is enough | CPU · MEM · SYS C: · IO ALL · temperature on one strip |
-| Trends only when needed | Click to expand a compact **10-minute** history |
-| Missing sensors lie | Shows **`N/A` / invalid** — never invents temperatures |
+| CPU、内存、系统盘容量与全部磁盘 I/O | 点击状态栏，展开最近 10 分钟的变化 |
+| 温度传感器状态 | 缺失或无效读数显示 `N/A`；查看温度说明 |
+| 后台采集状态 | 采集失败时标明使用上次读数，恢复后更新 |
 
-<p align="center">
-  <img src="docs/preview.svg" width="100%" alt="HardwareMonitor micro-bar over sample desktop documents with expanded trend panel.">
-</p>
+**选择下载版还是源码版。** 已发布的 `v1.0.0` 会在启动时请求管理员权限；当前源码另有普通启动、手动管理员重启、托盘和设置保存等更新。下方分别说明下载和源码使用方法。
 
 ## How it works
 
